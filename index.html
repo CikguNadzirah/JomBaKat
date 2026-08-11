@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JOM BACA KUAT! – Cabaran Bacaan Bahasa Melayu</title>
+  <style>
+    :root {
+      --primary: #FF6B6B;
+      --secondary: #4ECDC4;
+      --accent: #FFE66D;
+      --dark: #2C3E50;
+      --light: #F7F9FC;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Comic Sans MS', 'Lexend', cursive, sans-serif;
+    }
+
+    body {
+      background-color: #E0F7FA;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      border-radius: 25px;
+      padding: 30px;
+      width: 100%;
+      max-width: 800px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      border: 5px solid var(--secondary);
+      text-align: center;
+      position: relative;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    h1 {
+      color: var(--primary);
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px var(--accent);
+    }
+
+    p {
+      color: var(--dark);
+      font-size: 1.2rem;
+      line-height: 1.6;
+    }
+
+    /* Input Nama Murid */
+    .input-box {
+      margin: 20px 0;
+    }
+
+    .input-box input {
+      padding: 12px 20px;
+      font-size: 1.2rem;
+      border: 3px solid var(--secondary);
+      border-radius: 25px;
+      width: 80%;
+      max-width: 350px;
+      text-align: center;
+      outline: none;
+    }
+
+    .input-box input:focus {
+      border-color: var(--primary);
+    }
+
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 15px 35px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      margin: 15px 5px;
+      box-shadow: 0 5px 0 #C0392B;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 0 #C0392B;
+    }
+
+    .btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #C0392B;
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary);
+      box-shadow: 0 5px 0 #16A085;
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 7px 0 #16A085;
+    }
+
+    .reading-box {
+      background-color: var(--light);
+      border: 3px dashed var(--secondary);
+      border-radius: 15px;
+      padding: 25px;
+      margin: 20px 0;
+      font-size: 1.5rem;
+      line-height: 2;
+      text-align: justify;
+      color: #333;
+    }
+
+    .mic-icon {
+      font-size: 4rem;
+      cursor: pointer;
+      user-select: none;
+      margin: 20px 0;
+      display: inline-block;
+    }
+
+    .pulse {
+      animation: pulse-animation 1.5s infinite;
+    }
+
+    @keyframes pulse-animation {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); color: var(--primary); }
+      100% { transform: scale(1); }
+    }
+
+    .score-card {
+      background: var(--accent);
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      font-size: 1.2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .badge {
+      font-size: 1.5rem;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- SKRIN 1: HALAMAN UTAMA -->
+  <div id="skrin1" class="screen active">
+    <h1>JOM BACA KUAT! 📖</h1>
+    <p><b>Cabaran Bacaan Bahasa Melayu</b></p>
+    
+    <div class="input-box">
+      <input type="text" id="namaMuridInput" placeholder="Masukkan Nama Anda Di Sini..." autocomplete="off">
+    </div>
+
+    <button class="btn" onclick="mulaPermainan()">▶ MULA MEMBACA</button>
+    <br>
+    <button class="btn btn-secondary" onclick="tukarSkrin('skrinGuru')">👨‍🏫 REKOD GURU</button>
+  </div>
+
+  <!-- SKRIN 2: ARAHAN -->
+  <div id="skrin2" class="screen">
+    <h2>Cara Bermain 🎯</h2>
+    <p>Selamat datang, <b id="paparanNamaMurid" style="color:var(--primary);"></b>!</p>
+    <p>1. Pilih tahap dan petikan yang disediakan.</p>
+    <p>2. Baca petikan di bawah dengan suara yang jelas.</p>
+    <p>3. Tekan butang mikrofon dan mula membaca.</p>
+    <button class="btn" onclick="tukarSkrin('skrin3')">🎤 SAYA DAH SEDIA</button>
+  </div>
+
+  <!-- SKRIN 3 & 4: PETIKAN & AKTIVITI MEMBACA -->
+  <div id="skrin3" class="screen">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <span id="labelTahap" style="font-weight: bold; color: var(--primary);">Tahap 1</span>
+      <select id="pilihPetikan" onchange="tukarPetikan()" style="padding: 5px; font-size: 1rem;">
+        <option value="0">Tema 1: Kawan Baharu</option>
+        <option value="1">Tema 2: Hari di Sekolah</option>
+        <option value="2">Tema 3: Kucing Kesayangan</option>
+        <option value="3">Tema 4: Berkebun Bersama Ibu</option>
+        <option value="4">Tema 5: Hari Sukan</option>
+      </select>
+    </div>
+
+    <div class="reading-box" id="teksPetikan">
+      <!-- Teks petikan dimasukkan secara dinamik -->
+    </div>
+
+    <div id="statusMikrofon">
+      <div id="micBtn" class="mic-icon" onclick="mulaRakaman()">🎤</div>
+      <p id="teksStatus">Tekan mikrofon untuk mula membaca</p>
+    </div>
+
+    <button class="btn btn-secondary" id="btnSelesai" onclick="hentikanRakaman()" style="display:none;">SELESAI</button>
+  </div>
+
+  <!-- SKRIN KEPUTUSAN -->
+  <div id="skrinKeputusan" class="screen">
+    <h1 id="tajukPencapaian">🌟 SYABAS!</h1>
+    <p id="mesejMaklumBalas">Hebat! Anda telah selesai membaca.</p>
+
+    <div class="score-card">
+      <p>👤 Nama: <b id="skorNamaMurid">-</b></p>
+      <p>⭐ Ketepatan Bacaan: <b id="skorKetepatan">0%</b></p>
+      <p>📖 Perkataan Ditangkap: <b id="bilPerkataan">0/0</b></p>
+      <p>🏆 Total Skor: <b id="skorKeseluruhan">0/100</b></p>
+      <div id="bekasGanjaran" class="badge"></div>
+    </div>
+
+    <button class="btn" onclick="tukarSkrin('skrin3')">🔄 CUBA LAGI</button>
+    <button class="btn btn-secondary" onclick="tukarSkrin('skrin1')">🏠 HALAMAN UTAMA</button>
+  </div>
+
+  <!-- REKOD PRESTASI GURU -->
+  <div id="skrinGuru" class="screen">
+    <h2>👨‍🏫 Rekod Prestasi Murid</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama Murid</th>
+          <th>Tarikh</th>
+          <th>Tajuk Petikan</th>
+          <th>Ketepatan</th>
+          <th>Skor</th>
+          <th>Bintang</th>
+        </tr>
+      </thead>
+      <tbody id="jadualRekod">
+        <!-- Rekod automatik dimasukkan di sini -->
+      </tbody>
+    </table>
+    <br>
+    <button class="btn" onclick="tukarSkrin('skrin1')">⬅ KEMBALI</button>
+  </div>
+
+</div>
+
+<script>
+  // Koleksi Data Petikan
+  const senaraiPetikan = [
+    {
+      tahap: "Tahap 1: 🌱 Pembaca Mula",
+      tajuk: "Kawan Baharu",
+      teks: "Ini Adam. Adam kawan baharu saya. Adam suka membaca buku cerita. Kami belajar di kelas yang sama. Setiap hari kami duduk bersama dan makan di kantin sekolah."
+    },
+    {
+      tahap: "Tahap 1: 🌱 Pembaca Mula",
+      tajuk: "Hari di Sekolah",
+      teks: "Hari ini hari pertama sekolah. Saya memakai seragam baharu yang bersih. Guru menyapa kami dengan senyuman mesra. Saya berasa sangat gembira dapat berjumpa dengan kawan-kawan."
+    },
+    {
+      tahap: "Tahap 2: 🌟 Pembaca Muda",
+      tajuk: "Kucing Kesayangan",
+      teks: "Comel ialah kucing kesayangan saya. Bulunya berwarna putih dan sangat lembut. Setiap petang, saya bermain bola kecil bersama Comel di halaman rumah. Saya memberi Comel makan ikan dan minum susu segar."
+    },
+    {
+      tahap: "Tahap 2: 🌟 Pembaca Muda",
+      tajuk: "Berkebun Bersama Ibu",
+      teks: "Pada hujung minggu, saya menolong ibu berkebun di belakang rumah. Kami menanam pelbagai jenis sayur seperti sawi, terung dan cili. Saya menolong ibu menyiram pokok bunga dan mencabut rumput rampai."
+    },
+    {
+      tahap: "Tahap 3: 🚀 Pembaca Lancar",
+      tajuk: "Hari Sukan",
+      teks: "Sekolah saya menganjurkan Hari Sukan Tahunan pada hari Sabtu. Acara dimulakan dengan perarakan rumah sukan yang sangat meriah. Saya menyertai acara lari 100 meter. Ramai ibu bapa datang untuk memberikan sokongan."
+    }
+  ];
+
+  let namaMurid = "";
+  let petikanSemasa = 0;
+  let recognition;
+  let teksDipertuturkan = "";
+  let rekodGuru = [];
+
+  // Inisialisasi Pengecaman Suara
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'ms-MY';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      teksDipertuturkan = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        teksDipertuturkan += event.results[i][0].transcript;
+      }
+    };
+
+    recognition.onerror = (event) => {
+      console.log("Ralat pengecaman suara:", event.error);
+    };
+  } else {
+    alert("Pelayar anda tidak menyokong pengecaman suara. Sila guna Google Chrome.");
+  }
+
+  function mulaPermainan() {
+    const input = document.getElementById('namaMuridInput').value.trim();
+    if (input === "") {
+      alert("Sila masukkan nama anda terlebih dahulu!");
+      return;
+    }
+    namaMurid = input;
+    document.getElementById('paparanNamaMurid').innerText = namaMurid;
+    tukarSkrin('skrin2');
+  }
+
+  function tukarSkrin(idSkrin) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(idSkrin).classList.add('active');
+    if (idSkrin === 'skrin3') {
+      tukarPetikan();
+    }
+  }
+
+  function tukarPetikan() {
+    petikanSemasa = document.getElementById('pilihPetikan').value;
+    const data = senaraiPetikan[petikanSemasa];
+    document.getElementById('labelTahap').innerText = data.tahap;
+    document.getElementById('teksPetikan').innerText = data.teks;
+    sediaStatusAwal();
+  }
+
+  function sediaStatusAwal() {
+    document.getElementById('micBtn').classList.remove('pulse');
+    document.getElementById('teksStatus').innerText = "Tekan mikrofon untuk mula membaca";
+    document.getElementById('btnSelesai').style.display = "none";
+    teksDipertuturkan = "";
+  }
+
+  function mulaRakaman() {
+    if (!recognition) return;
+    teksDipertuturkan = "";
+    recognition.start();
+    document.getElementById('micBtn').classList.add('pulse');
+    document.getElementById('teksStatus').innerText = "Sedang mendengar... Baca sekarang!";
+    document.getElementById('btnSelesai').style.display = "inline-block";
+  }
+
+  function hentikanRakaman() {
+    if (!recognition) return;
+    recognition.stop();
+    document.getElementById('micBtn').classList.remove('pulse');
+    setTimeout(prosesKeputusan, 1000);
+  }
+
+  function prosesKeputusan() {
+    const teksAsal = senaraiPetikan[petikanSemasa].teks.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+    const teksInput = teksDipertuturkan.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+
+    const senaraiAsal = teksAsal.split(/\s+/);
+    const senaraiInput = teksInput.split(/\s+/);
+
+    let betul = 0;
+    senaraiAsal.forEach(perkataan => {
+      if (senaraiInput.includes(perkataan)) {
+        betul++;
+      }
+    });
+
+    const peratus = Math.min(100, Math.round((betul / senaraiAsal.length) * 100));
+    
+    // Papar Keputusan
+    document.getElementById('skorNamaMurid').innerText = namaMurid;
+    document.getElementById('skorKetepatan').innerText = `${peratus}%`;
+    document.getElementById('bilPerkataan').innerText = `${betul}/${senaraiAsal.length}`;
+    document.getElementById('skorKeseluruhan').innerText = `${peratus}/100`;
+
+    // Penilaian Pencapaian
+    let tajuk = "", mesej = "", ganjaran = "";
+    if (peratus >= 90) {
+      tajuk = "🏆 PEMBACA HEBAT!";
+      mesej = "Luar biasa! Sebutan kamu sangat jelas dan lancar!";
+      ganjaran = "⭐⭐⭐ (3 Bintang + Pingat Emas)";
+    } else if (peratus >= 75) {
+      tajuk = "⭐ PEMBACA CEMERLANG!";
+      mesej = "Syabas! Sebutan kamu semakin jelas dan baik.";
+      ganjaran = "⭐⭐ (2 Bintang + Pingat Perak)";
+    } else if (peratus >= 60) {
+      tajuk = "👍 PEMBACA BAIK!";
+      mesej = "Bagus! Cuba baca dengan lebih perlahan dan tenang.";
+      ganjaran = "⭐ (1 Bintang)";
+    } else {
+      tajuk = "💪 TERUS BERLATIH!";
+      mesej = "Usaha yang bagus! Teruskan berlatih, kamu pasti boleh!";
+      ganjaran = "⭐ (1 Bintang Galakan)";
+    }
+
+    document.getElementById('tajukPencapaian').innerText = tajuk;
+    document.getElementById('mesejMaklumBalas').innerText = mesej;
+    document.getElementById('bekasGanjaran').innerText = ganjaran;
+
+    // Simpan Rekod Guru Bersama Nama Murid
+    const hariIni = new Date().toLocaleDateString('ms-MY');
+    rekodGuru.push({
+      nama: namaMurid,
+      tarikh: hariIni,
+      tajuk: senaraiPetikan[petikanSemasa].tajuk,
+      ketepatan: `${peratus}%`,
+      skor: peratus,
+      bintang: peratus >= 90 ? "⭐⭐⭐" : peratus >= 75 ? "⭐⭐" : "⭐"
+    });
+    kemaskiniJadualGuru();
+
+    tukarSkrin('skrinKeputusan');
+  }
+
+  function kemaskiniJadualGuru() {
+    const tbody = document.getElementById('jadualRekod');
+    tbody.innerHTML = "";
+    rekodGuru.forEach(r => {
+      tbody.innerHTML += `
+        <tr>
+          <td><b>${r.nama}</b></td>
+          <td>${r.tarikh}</td>
+          <td>${r.tajuk}</td>
+          <td>${r.ketepatan}</td>
+          <td>${r.skor}</td>
+          <td>${r.bintang}</td>
+        </tr>
+      `;
+    });
+  }
+</script>
+
+</body>
+</html>
